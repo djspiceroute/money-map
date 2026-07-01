@@ -33,15 +33,14 @@ cards one purchase or two?").
   (any format)      (one schema)   (flag duplicates)   (rules + detection)    (insights)
 ```
 
-Five stages. Stages 1–2 ship as ready-to-run scripts in `scripts/`; stages 3–5
-provide the method, config templates, and reference docs for the agent (or you)
-to carry out — there is no fixed script for them yet:
+Five stages. Stages 1–4 ship as ready-to-run scripts in `scripts/`; stage 5 is
+a refresh routine built from rerunning the same scripts on new exports:
 
 1. **Normalize** every input to one canonical schema (`ingest.py` + `adapters.py`).
 2. **Merge & de-duplicate** the sources conservatively (`dedup.py`).
 3. **Categorize & enrich** - apply category rules, detect recurring charges,
-   normalize account names (see `references/enrichment.md`).
-4. **Build the dashboard** from the clean dataset (see `references/dashboard.md`).
+   normalize account names (`enrich.py`; see `references/enrichment.md`).
+4. **Build the dashboard** from the clean dataset (`build_dashboard.py`; see `references/dashboard.md`).
 5. **Refresh** on a cadence (see `references/refresh.md`).
 
 Read the linked reference file when you reach each stage; this file stays short
@@ -132,6 +131,12 @@ small editable CSVs so the user can correct mistakes and rebuild. See
 - **Recurring labels** (`recurring_labels.csv`: match, label, category) - rename
   cryptic bank descriptors to friendly names.
 
+Run the stage:
+
+```bash
+python enrich.py --in master_transactions.csv --out enriched_transactions.csv
+```
+
 ## Stage 4 - Build the dashboard
 
 The clean dataset powers a single self-contained HTML dashboard (opens in any
@@ -140,6 +145,12 @@ the full list of screens and the insight each one provides - Overview, Net
 Worth, Spending (category treemap, calendar heatmap, merchants, income
 sources), Recurring/Subscriptions, Accounts, Debt & payoff simulators,
 Transactions, and multi-year Analytics/Insights.
+
+Run the stage:
+
+```bash
+python build_dashboard.py --in enriched_transactions.csv --out "Finance Dashboard.html"
+```
 
 ## Stage 5 - Refresh
 
@@ -153,9 +164,9 @@ monthly/weekly routine: re-export or re-pull, re-run ingest -> dedup -> build.
 2. Run `ingest.py --inspect`, then `ingest.py` to normalize. Confirm signs.
 3. Run `dedup.py --audit-only`, summarize the audit in plain language, and ask
    about anything in the CROSS list before applying.
-4. Set up category/alias CSVs with sensible defaults; invite them to correct any
-   miscategorized merchants, then rebuild.
-5. Build the dashboard and walk them through what each screen tells them.
+4. Set up category/alias CSVs with sensible defaults; run `enrich.py`; invite
+   them to correct any miscategorized merchants, then rebuild.
+5. Run `build_dashboard.py` and walk them through what each screen tells them.
 
 Keep questions short and concrete, default to safe choices, and never delete
 their data without confirmation.

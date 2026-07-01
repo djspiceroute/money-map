@@ -4,7 +4,7 @@
 
 money-map is an **agent skill** paired with a set of small, dependency-free Python scripts. Point it at a folder of CSV exports (or a live Plaid connection) and it normalizes wildly different formats into one canonical schema, conservatively merges and de-duplicates overlapping sources, categorizes spending with editable rules, detects recurring subscriptions and bills, and builds a self-contained HTML dashboard with spending, net-worth, debt, and trend insights.
 
-It's built on the open [Agent Skills](https://agentskills.io/specification) format, so it isn't tied to any one assistant — it works with any AI coding agent that reads that format (Claude, Codex, Copilot CLI, Gemini CLI, …), or standalone (the ingest + dedup scripts are just Python — see [what's implemented today](#whats-implemented-today)).
+It's built on the open [Agent Skills](https://agentskills.io/specification) format, so it isn't tied to any one assistant — it works with any AI coding agent that reads that format (Claude, Codex, Copilot CLI, Gemini CLI, …), or standalone (the pipeline scripts are just Python — see [what's implemented today](#whats-implemented-today)).
 
 > 🔒 **Everything runs locally.** No data is uploaded anywhere. The scripts are Python-stdlib-only, and the dashboard is a single offline HTML file. Your financial data never leaves your machine.
 
@@ -24,17 +24,17 @@ Financial data is scattered across banks, credit cards, and finance apps — eac
 
 ### What's implemented today
 
-money-map is delivered as **runnable scripts for the data pipeline** plus **reference specs the agent follows** for the enrichment and dashboard stages:
+money-map is delivered as **runnable scripts for the data pipeline** plus reference docs that explain the method behind each stage:
 
 | Stage | Status |
 |---|---|
 | Normalize (ingest + adapters) | ✅ script — `ingest.py` / `adapters.py` |
 | Merge & de-duplicate | ✅ script — `dedup.py` |
 | Plaid / Copilot conversion | ✅ scripts — `plaid_to_csv.py`, `copilot_to_csv.py` |
-| Categorize & enrich (category rules, recurring detection, account aliases) | 📄 method + editable CSV templates — the agent implements it from [`references/enrichment.md`](references/enrichment.md); no standalone script yet |
-| Dashboard | 📄 design contract — built from the canonical data per [`references/dashboard.md`](references/dashboard.md); no standalone builder yet |
+| Categorize & enrich (category rules, recurring detection, account aliases) | ✅ script — `enrich.py` |
+| Dashboard | ✅ script — `build_dashboard.py` |
 
-So **standalone (no AI), the scripts give you a clean, normalized, de-duplicated dataset.** The categorization/recurring detection and the dashboard are specs for an AI agent (or you) to generate from the reference docs — a `scripts/enrich.py` and `scripts/build_dashboard.py` are the top [roadmap](ROADMAP.md) items.
+So **standalone (no AI), the scripts can produce a clean, normalized, de-duplicated, enriched dataset and a local offline dashboard.** The reference docs remain the source of truth for how each stage works and how to extend it.
 
 ## How it works
 
@@ -70,6 +70,8 @@ You'll see the Apple Card and generic-bank formats auto-detected, purchases norm
 
 ```bash
 python3 dedup.py --in canonical_transactions.csv --out master_transactions.csv --apply
+python3 enrich.py --in master_transactions.csv --out enriched_transactions.csv
+python3 build_dashboard.py --in enriched_transactions.csv --out "Finance Dashboard.html"
 ```
 
 > The sample data is entirely fictional (`ACME CORP`, `Example Bank`, fake store numbers). Replace `../assets/sample_data` with a folder of your own exports to use it for real.
@@ -96,7 +98,7 @@ Once installed, the skill activates automatically when you ask about importing t
 
 **No skills support?** In a plain chatbot, custom GPT, or project workspace, paste [`SKILL.md`](SKILL.md) in as instructions/context and run the scripts yourself — same playbook. The only hard requirement is that the agent (or you) can **access the filesystem and run Python**; a chat with no code execution can advise on the data but can't run the pipeline.
 
-**No AI at all?** The ingest + dedup scripts are plain stdlib Python — run the [Quickstart](#quickstart-try-it-on-the-bundled-sample-data) to get a clean, de-duplicated dataset. (Enrichment and the dashboard are agent/reference-driven — see [what's implemented today](#whats-implemented-today).)
+**No AI at all?** The scripts are plain stdlib Python — run the [Quickstart](#quickstart-try-it-on-the-bundled-sample-data) to get a clean, de-duplicated, enriched dataset and an offline dashboard.
 
 ## Supported sources
 
@@ -140,6 +142,8 @@ money-map/
 │   ├── ingest.py            # normalize a folder of exports → canonical CSV
 │   ├── adapters.py          # source adapters + auto-detection
 │   ├── dedup.py             # conservative merge + duplicate audit
+│   ├── enrich.py            # category rules, account aliases, recurring detection
+│   ├── build_dashboard.py   # offline single-file HTML dashboard
 │   ├── plaid_to_csv.py      # Plaid JSON dump → canonical CSV
 │   └── copilot_to_csv.py    # Copilot CLI JSON → canonical CSV
 └── assets/                  # editable config templates + synthetic sample data
