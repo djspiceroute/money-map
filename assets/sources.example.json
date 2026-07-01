@@ -1,0 +1,10 @@
+{
+  "_comment": "Optional. Only needed when auto-detection needs help (e.g. two generic-format files that are different accounts). Run: python ingest.py --config sources.json --out canonical_transactions.csv",
+  "sources": [
+    {"file": "inbox/applecard.csv", "adapter": "apple_card"},
+    {"file": "inbox/copilot_export.csv", "adapter": "copilot"},
+    {"file": "inbox/chase_checking.csv", "adapter": "generic_amount", "account": "Chase Checking", "institution": "Chase"},
+    {"file": "inbox/ally_savings.csv", "adapter": "generic_debit_credit", "account": "Ally Savings", "institution": "Ally"},
+    {"file": "inbox/plaid_canonical.csv", "adapter": "plaid"}
+  ]
+}

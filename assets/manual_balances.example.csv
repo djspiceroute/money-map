@@ -1,0 +1,7 @@
+account,balance,type,note
+Apple Card,1234.56,credit,card whose CSV export omits a current balance
+Fidelity Brokerage,42000.00,investment,taxable brokerage (stocks/ETFs)
+Vanguard IRA,68000.00,investment,retirement account
+Coinbase,5300.00,investment,crypto wallet/exchange value
+Home Mortgage,-310000.00,loan,liabilities are NEGATIVE (reduce net worth)
+Auto Loan,-18500.00,loan,

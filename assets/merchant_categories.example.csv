@@ -1,0 +1,30 @@
+match,category,subcategory,note
+costco gas,Gas,,specific rule before the general costco rule
+costco,Warehouse,Warehouse Club,warehouse clubs mix groceries+goods; own bucket
+starbucks,Food & Dining,Coffee,subcategory column is optional
+peet,Food & Dining,Coffee,
+whole foods,Groceries,,
+trader joe,Groceries,,
+safeway,Groceries,
+shell,Gas,
+chevron,Gas,
+exxon,Gas,
+uber,Transportation,
+lyft,Transportation,
+delta,Travel,
+marriott,Travel,
+airbnb,Travel,
+netflix,Subscriptions,
+spotify,Subscriptions,
+youtube premium,Subscriptions,
+amazon prime,Subscriptions,
+github,Subscriptions,
+comcast,Utilities,
+at&t,Utilities,
+verizon,Utilities,
+geico,Insurance,
+state farm,Insurance,
+cvs,Health,
+walgreens,Health,
+monthly maintenance,Fees,,bank maintenance fee
+overdraft,Fees,,

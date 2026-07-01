@@ -1,0 +1,34 @@
+# ============================================================================
+#  Privacy guardrail — NEVER commit real financial data.
+#  All CSV/JSON/TSV are ignored by default; only the bundled synthetic
+#  examples under assets/ are tracked. Do not put real exports in assets/.
+# ============================================================================
+*.csv
+*.json
+*.tsv
+
+# Re-include ONLY the bundled synthetic examples + sample data
+!assets/
+!assets/**
+
+# Pipeline outputs (belt-and-suspenders; also covered by the rules above)
+/canonical_transactions.csv
+/master_transactions.csv
+/Duplicate Audit.md
+/networth-history.json
+/finance-data.js
+/Finance Dashboard*.html
+/plaid_dump.json
+/copilot_dump.json
+inbox/
+config/
+outputs/
+*.pdf
+
+# Python / macOS cruft
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.DS_Store

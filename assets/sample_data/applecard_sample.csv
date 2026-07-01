@@ -1,0 +1,5 @@
+Transaction Date,Clearing Date,Description,Merchant,Category,Type,Amount (USD)
+06/01/2026,06/02/2026,STARBUCKS STORE 123,Starbucks,Restaurants,Purchase,5.75
+06/03/2026,06/04/2026,NETFLIX.COM,Netflix,Entertainment,Purchase,15.49
+06/05/2026,06/06/2026,WHOLE FOODS MKT,Whole Foods,Grocery,Purchase,82.30
+06/10/2026,06/11/2026,ACME PAYMENT,Acme,Payment,Payment,-200.00

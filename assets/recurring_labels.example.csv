@@ -1,0 +1,4 @@
+match,label,category,note
+autodraft,Auto Loan,Debt,rename a cryptic bank descriptor
+monthly maintenance,Bank Fee,Fees,
+ach pmt,Card Payment,Transfer,
