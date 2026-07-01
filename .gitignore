@@ -1,15 +1,17 @@
 # ============================================================================
 #  Privacy guardrail — NEVER commit real financial data.
-#  All CSV/JSON/TSV are ignored by default; only the bundled synthetic
-#  examples under assets/ are tracked. Do not put real exports in assets/.
+#  All CSV/JSON/TSV are ignored by default; only the specific bundled synthetic
+#  examples are re-included, BY EXPLICIT NAME PATTERN. A real export dropped in
+#  assets/ (e.g. assets/mybank.csv) does NOT match these and stays ignored.
 # ============================================================================
 *.csv
 *.json
 *.tsv
 
 # Re-include ONLY the bundled synthetic examples + sample data
-!assets/
-!assets/**
+!assets/*.example.csv
+!assets/*.example.json
+!assets/sample_data/*_sample.csv
 
 # Pipeline outputs (belt-and-suspenders; also covered by the rules above)
 /canonical_transactions.csv

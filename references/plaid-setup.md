@@ -39,10 +39,12 @@ plaid trial               # opens the Trial plan application in the browser
 plaid keys fetch          # refresh local keys after approval -> Production
 ```
 
-The Trial plan is free, gives **real Production data**, supports up to **10
-linked banks**, and includes the products this skill uses (Transactions, Balance,
-Liabilities, Investments) across most major US/Canada banks (Chase, Bank of
-America, Wells Fargo, etc.). Non-US/Canada institutions aren't on Trial.
+As of this writing the Trial plan is free, gives **real Production data**, supports
+roughly **10 linked banks**, and includes the products this skill uses (Transactions,
+Balance, Liabilities, Investments) across most major US/Canada banks (Chase, Bank of
+America, Wells Fargo, etc.); Non-US/Canada institutions aren't on Trial. Plaid's plan
+names, limits, and pricing change over time — **confirm the current terms in the Plaid
+dashboard** rather than relying on these numbers.
 
 **4. Link the user's banks.** `plaid link` opens Plaid Link in the browser; the
 user logs into each bank as they normally would - the CLI never sees the bank

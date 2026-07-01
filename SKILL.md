@@ -33,7 +33,9 @@ cards one purchase or two?").
   (any format)      (one schema)   (flag duplicates)   (rules + detection)    (insights)
 ```
 
-Five stages, each with a script in `scripts/`:
+Five stages. Stages 1–2 ship as ready-to-run scripts in `scripts/`; stages 3–5
+provide the method, config templates, and reference docs for the agent (or you)
+to carry out — there is no fixed script for them yet:
 
 1. **Normalize** every input to one canonical schema (`ingest.py` + `adapters.py`).
 2. **Merge & de-duplicate** the sources conservatively (`dedup.py`).
@@ -55,7 +57,7 @@ canonical schema. Auto-detection picks the right adapter from the file's
 headers; you rarely need to specify it.
 
 Canonical schema (one row per transaction):
-`date, description, amount (negative = money out), account, institution, category, source`
+`date, description, amount (negative = money out), account, institution, category, subcategory, source`
 
 To ingest a folder of exports:
 

@@ -4,7 +4,7 @@
 
 money-map is an **agent skill** paired with a set of small, dependency-free Python scripts. Point it at a folder of CSV exports (or a live Plaid connection) and it normalizes wildly different formats into one canonical schema, conservatively merges and de-duplicates overlapping sources, categorizes spending with editable rules, detects recurring subscriptions and bills, and builds a self-contained HTML dashboard with spending, net-worth, debt, and trend insights.
 
-It's built on the open [Agent Skills](https://agentskills.io/specification) format, so it isn't tied to any one assistant — it works with any AI coding agent that reads that format (Claude, Codex, Copilot CLI, Gemini CLI, …), or standalone with no AI at all (the pipeline is just Python).
+It's built on the open [Agent Skills](https://agentskills.io/specification) format, so it isn't tied to any one assistant — it works with any AI coding agent that reads that format (Claude, Codex, Copilot CLI, Gemini CLI, …), or standalone (the ingest + dedup scripts are just Python — see [what's implemented today](#whats-implemented-today)).
 
 > 🔒 **Everything runs locally.** No data is uploaded anywhere. The scripts are Python-stdlib-only, and the dashboard is a single offline HTML file. Your financial data never leaves your machine.
 
@@ -21,6 +21,20 @@ Financial data is scattered across banks, credit cards, and finance apps — eac
 - **Editable, code-free enrichment** — category rules, account aliases, and friendly recurring labels all live in small CSVs you can correct and rebuild.
 - **Automatic recurring/subscription detection** from amount-repetition over time (catches subs no rule knows about, and flags "possibly cancelled" ones).
 - **A private dashboard** — Overview, Net Worth, Spending, Recurring/Subscriptions, Accounts, Debt & Bills, Transactions, and multi-year Analytics.
+
+### What's implemented today
+
+money-map is delivered as **runnable scripts for the data pipeline** plus **reference specs the agent follows** for the enrichment and dashboard stages:
+
+| Stage | Status |
+|---|---|
+| Normalize (ingest + adapters) | ✅ script — `ingest.py` / `adapters.py` |
+| Merge & de-duplicate | ✅ script — `dedup.py` |
+| Plaid / Copilot conversion | ✅ scripts — `plaid_to_csv.py`, `copilot_to_csv.py` |
+| Categorize & enrich (category rules, recurring detection, account aliases) | 📄 method + editable CSV templates — the agent implements it from [`references/enrichment.md`](references/enrichment.md); no standalone script yet |
+| Dashboard | 📄 design contract — built from the canonical data per [`references/dashboard.md`](references/dashboard.md); no standalone builder yet |
+
+So **standalone (no AI), the scripts give you a clean, normalized, de-duplicated dataset.** The categorization/recurring detection and the dashboard are specs for an AI agent (or you) to generate from the reference docs — a `scripts/enrich.py` and `scripts/build_dashboard.py` are the top [roadmap](ROADMAP.md) items.
 
 ## How it works
 
@@ -82,7 +96,7 @@ Once installed, the skill activates automatically when you ask about importing t
 
 **No skills support?** In a plain chatbot, custom GPT, or project workspace, paste [`SKILL.md`](SKILL.md) in as instructions/context and run the scripts yourself — same playbook. The only hard requirement is that the agent (or you) can **access the filesystem and run Python**; a chat with no code execution can advise on the data but can't run the pipeline.
 
-**No AI at all?** The scripts are plain stdlib Python — just run the [Quickstart](#quickstart-try-it-on-the-bundled-sample-data) commands directly.
+**No AI at all?** The ingest + dedup scripts are plain stdlib Python — run the [Quickstart](#quickstart-try-it-on-the-bundled-sample-data) to get a clean, de-duplicated dataset. (Enrichment and the dashboard are agent/reference-driven — see [what's implemented today](#whats-implemented-today).)
 
 ## Supported sources
 
