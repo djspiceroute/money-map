@@ -2,7 +2,9 @@
 
 **Turn messy financial exports from every bank and app into one clean, de-duplicated, categorized dataset — and a private local dashboard.**
 
-money-map is a [Claude](https://claude.ai) **skill** plus a set of small, dependency-free Python scripts. Point it at a folder of CSV exports (or a live Plaid connection) and it normalizes wildly different formats into one canonical schema, conservatively merges and de-duplicates overlapping sources, categorizes spending with editable rules, detects recurring subscriptions and bills, and builds a self-contained HTML dashboard with spending, net-worth, debt, and trend insights.
+money-map is an **agent skill** paired with a set of small, dependency-free Python scripts. Point it at a folder of CSV exports (or a live Plaid connection) and it normalizes wildly different formats into one canonical schema, conservatively merges and de-duplicates overlapping sources, categorizes spending with editable rules, detects recurring subscriptions and bills, and builds a self-contained HTML dashboard with spending, net-worth, debt, and trend insights.
+
+It's built on the open [Agent Skills](https://agentskills.io/specification) format, so it isn't tied to any one assistant — it works with any AI coding agent that reads that format (Claude, Codex, Copilot CLI, Gemini CLI, …), or standalone with no AI at all (the pipeline is just Python).
 
 > 🔒 **Everything runs locally.** No data is uploaded anywhere. The scripts are Python-stdlib-only, and the dashboard is a single offline HTML file. Your financial data never leaves your machine.
 
@@ -58,18 +60,29 @@ python3 dedup.py --in canonical_transactions.csv --out master_transactions.csv -
 
 > The sample data is entirely fictional (`ACME CORP`, `Example Bank`, fake store numbers). Replace `../assets/sample_data` with a folder of your own exports to use it for real.
 
-## Using it with Claude (the intended way)
+## Using it with an AI agent
 
-money-map is designed to be driven by Claude for a **non-technical user** — you just drop exports in a folder and say *"import my transactions"* or *"build me a finance dashboard,"* and Claude runs the pipeline, makes sensible defaults, and asks short plain-language questions only when something needs your judgment.
+money-map is built to be **driven by an AI coding agent** for a non-technical user: you drop exports in a folder and say *"import my transactions"* or *"build me a finance dashboard,"* and the agent runs the pipeline, picks sensible defaults, and asks short plain-language questions only when something needs your judgment. [`SKILL.md`](SKILL.md) is the playbook the agent follows.
 
-Install it as a personal skill:
+Because it uses the open [Agent Skills](https://agentskills.io/specification) format (a `SKILL.md` plus supporting files), you install it by dropping the `money-map/` folder into your agent's skills directory:
+
+| Agent | Where it goes |
+|---|---|
+| **Claude Code / Claude Desktop** | `~/.claude/skills/money-map/` |
+| **OpenAI Codex CLI** | its skills dir, or the cross-runtime `~/.agents/skills/money-map/` |
+| **GitHub Copilot CLI** | auto-discovered from installed skills |
+| **Gemini CLI** | activates via its skill mechanism |
 
 ```bash
-# Claude Code
+# example: Claude Code
 git clone https://github.com/djspiceroute/money-map.git ~/.claude/skills/money-map
 ```
 
-In the **Claude desktop app**, add it via the app's skill/import mechanism (point it at this repo or the cloned folder). Once installed, the skill activates automatically when you ask about importing transactions, combining statements, tracking net worth, finding subscriptions, or building a budgeting/finance dashboard. See [`SKILL.md`](SKILL.md) for the full instructions Claude follows.
+Once installed, the skill activates automatically when you ask about importing transactions, combining statements, tracking net worth, finding subscriptions, or building a budgeting/finance dashboard.
+
+**No skills support?** In a plain chatbot, custom GPT, or project workspace, paste [`SKILL.md`](SKILL.md) in as instructions/context and run the scripts yourself — same playbook. The only hard requirement is that the agent (or you) can **access the filesystem and run Python**; a chat with no code execution can advise on the data but can't run the pipeline.
+
+**No AI at all?** The scripts are plain stdlib Python — just run the [Quickstart](#quickstart-try-it-on-the-bundled-sample-data) commands directly.
 
 ## Supported sources
 
@@ -101,7 +114,7 @@ See [`references/enrichment.md`](references/enrichment.md) for the full method.
 
 ```
 money-map/
-├── SKILL.md                 # the skill Claude follows (start here)
+├── SKILL.md                 # the skill the agent follows (start here)
 ├── ROADMAP.md               # feature ideas + credit to the OSS apps that inspired them
 ├── references/              # deep-dive docs, loaded on demand
 │   ├── source-adapters.md   # canonical schema + adding new sources

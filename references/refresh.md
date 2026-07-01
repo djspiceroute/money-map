@@ -20,8 +20,9 @@ people; weekly if they want a tighter pulse.
 
 - Keep a single `inbox/` folder; the user just drops new exports there and says
   "refresh". Auto-detection handles the formats.
-- **Optional - schedule it in Claude Cowork.** If the user is running this inside
-  Claude Cowork, offer to set up a **scheduled task** (e.g. "on the 1st of each
+- **Optional - schedule it.** If the agent supports scheduled/recurring tasks
+  (e.g. Claude Cowork, or any cron-style runner), offer to set up a **scheduled
+  task** (e.g. "on the 1st of each
   month") that reminds them to refresh and kicks off the pipeline. Phrase the
   scheduled prompt as a reminder-plus-run, e.g. *"Remind me to refresh my finance
   dashboard: pull the latest Plaid data and re-run ingest -> dedup -> build."*
