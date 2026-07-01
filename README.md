@@ -102,6 +102,7 @@ See [`references/enrichment.md`](references/enrichment.md) for the full method.
 ```
 money-map/
 ├── SKILL.md                 # the skill Claude follows (start here)
+├── ROADMAP.md               # feature ideas + credit to the OSS apps that inspired them
 ├── references/              # deep-dive docs, loaded on demand
 │   ├── source-adapters.md   # canonical schema + adding new sources
 │   ├── enrichment.md        # categories, aliases, recurring detection, net worth
@@ -123,12 +124,30 @@ money-map/
 - **The repo contains no real data** — only synthetic samples and `.example` config templates.
 - **The [`.gitignore`](.gitignore) blocks real data by default.** All `*.csv`/`*.json` are ignored except the bundled examples, so if you run the pipeline inside a clone, your own exports and generated dashboards won't be committed. Don't put real exports in `assets/`.
 
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for prioritized feature ideas — real budgeting, savings-rate, bill due/paid status, investment analytics, and more — each credited to the open-source app that inspired it.
+
 ## Contributing
 
 Adapters for more banks/apps are the most useful contributions — most are a single dict in `scripts/adapters.py` plus a note in `references/source-adapters.md`. Please keep the scripts dependency-free (stdlib only) and never commit real financial data.
+
+## Credits & acknowledgements
+
+money-map stands on other people's work:
+
+**Integrations**
+- [**Plaid**](https://plaid.com) and its official [Plaid CLI](https://plaid.com/docs/resources/cli/) — the optional live bank connection (balances, liabilities, transactions), running locally.
+- [**copilot-money-cli**](https://github.com/JaviSoto/copilot-money-cli) by [**JaviSoto**](https://github.com/JaviSoto) — the unofficial community CLI used to pull Copilot Money data without a manual export.
+
+**Export formats adapted** — thanks to the apps whose CSV exports the built-in adapters read: Apple Card, [Copilot Money](https://copilot.money), Mint, [Monarch Money](https://www.monarchmoney.com), and [YNAB](https://www.ynab.com).
+
+**Feature & metric inspiration** — the roadmap draws ideas from these excellent open-source finance projects: [Wallos](https://github.com/ellite/Wallos), [Sure](https://github.com/we-promise/sure), [Firefly III](https://github.com/firefly-iii/firefly-iii), [Actual](https://github.com/actualbudget/actual), [Maybe](https://github.com/maybe-finance/maybe), [Paisa](https://github.com/ananthakumaran/paisa), and [Mintable](https://github.com/kevinschaich/mintable).
+
+**Built with** [Claude Code](https://claude.com/claude-code) — the skill, pipeline, and docs were designed and iterated with Claude.
 
 ## License
 
 [MIT](LICENSE) — © 2026 djspiceroute.
 
-*Not affiliated with Plaid, Copilot Money, Apple, Mint, Monarch, or YNAB. This is a personal-use tool, not financial advice.*
+*Not affiliated with Plaid, Copilot Money, Apple, Mint, Monarch, YNAB, or any project listed above. This is a personal-use tool, not financial advice.*
