@@ -157,7 +157,7 @@ money-map/
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for prioritized feature ideas — real budgeting, savings-rate, bill due/paid status, investment analytics, and more — each credited to the open-source app that inspired it.
+See [ROADMAP.md](ROADMAP.md) for the **Now / Next / Later** roadmap: *Now* finishes the dashboard to its documented spec (net-worth trend, ranges, richer analytics), *Next* adds budgeting / savings-rate / bill status, and *Later* covers investments and FIRE — each item credited to the open-source app that inspired it.
 
 ## Contributing
 

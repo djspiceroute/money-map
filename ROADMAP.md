@@ -1,8 +1,7 @@
-# Roadmap & feature ideas
+# Roadmap
 
-Ideas for extending money-map, with credit to the open-source finance apps that
-inspired them. The focus here is **functionality and metrics** we can adapt to
-the existing pipeline/dashboard — not UI. Apps reviewed for inspiration:
+Where money-map is headed, as a **Now / Next / Later** roadmap. Forward items draw
+feature/metric ideas from open-source finance apps, each credited inline:
 [Wallos](https://github.com/ellite/Wallos),
 [Sure](https://github.com/we-promise/sure) (a Maybe fork),
 [Firefly III](https://github.com/firefly-iii/firefly-iii),
@@ -11,66 +10,92 @@ the existing pipeline/dashboard — not UI. Apps reviewed for inspiration:
 [Paisa](https://github.com/ananthakumaran/paisa), and
 [Mintable](https://github.com/kevinschaich/mintable).
 
-## What each app is best at (one line)
+## Recently shipped
 
-| App | Core strength (functionality) |
-|---|---|
-| **Wallos** | Subscription/bill tracker: billing cycle, next-due date, cost normalized to monthly/yearly, per-category & per-payer totals, reminders. |
-| **Sure** (fork of Maybe) | General PFM: net worth across accounts, transactions, budgeting (trends, overages), investments, transfers. |
-| **Firefly III** | Double-entry PFM: budgets, bills with expected due-date + paid/unpaid status, categories, tags, rules engine, piggy banks (savings goals), recurring txns, rich reports. |
-| **Actual** | Envelope / zero-based budgeting (YNAB-style): rollover budgets, "to budget" balance, scheduled txns, rules, reconciliation, cash-flow & net-worth reports. |
-| **Maybe** | Wealth/net-worth: accounts + investment holdings, allocation, return/performance, forecasting. |
-| **Paisa** | Ledger-based investing: XIRR/returns, asset allocation, retirement/FIRE planning, capital gains, credit-card bill calendar, loan/interest schedules, live prices. |
-| **Mintable** | ETL only: Plaid → Sheets/CSV + categorization. |
+The full pipeline now runs end-to-end in code (`ingest → dedup → enrich → build_dashboard`):
 
-## What money-map already covers (parity or better)
+- **`enrich.py`** — category rules (outflow-only), account aliases, recurring/subscription
+  detection (cadence, normalized monthly cost, "possibly cancelled"), and net-worth typing
+  (cash / investment / credit / loan).
+- **`build_dashboard.py`** — a single, self-contained **offline** HTML dashboard (inline
+  data + CSS + JS, no network), light/dark, with eight screens.
+- **`tests/`** — adapter detection, sign normalization, dedup grouping, enrichment, and a
+  full-pipeline build (6 tests, green).
 
-- Net worth + trend over time (Maybe/Sure/Firefly).
-- Spending by category / subcategory / merchant / time, calendar heatmap, income sources.
-- Recurring & subscription detection, possibly-cancelled, BNPL, monthly cost — most apps make you enter subscriptions by hand; money-map detects them.
-- Debt: balances, utilization, payoff simulator + auto-loan projection.
-- Analytics many don't have: spending anomalies, subscription price-creep, YoY, cash-flow forecast, cash runway, safe-to-spend, committed-vs-flexible.
-- Multi-source ingestion + a conservative dedup audit (Mintable-like, but richer).
+## What's actually in the code today
 
-## Gaps / high-value additions (prioritized by value ÷ effort)
+Being honest about shipped code vs. what the reference docs describe:
 
-### Tier 1 — high value, mostly from data we already have
+| Area | In code (`✅`) | Described in `references/`, not built yet (`📄`) |
+|---|---|---|
+| Ingestion | ✅ multi-source adapters + auto-detect | — |
+| Dedupe | ✅ EXACT/CROSS audit, flag-don't-delete | — |
+| Categorize/enrich | ✅ rules, aliases, recurring detection | 📄 subcategory roll-up/filter (column shown, no aggregation) |
+| Net worth | ✅ point-in-time (assets − liabilities) | 📄 trend over time (`networth-history.json`) |
+| Spending | ✅ by category (bars), merchant, day, income sources | 📄 category treemap, calendar heatmap |
+| Recurring | ✅ full (monthly cost, possibly-cancelled) | — |
+| Debt & Bills | ✅ balances, "APR not provided" | 📄 utilization, payoff simulator, auto-loan projection |
+| Analytics | ✅ averages, top category/merchant, monthly table | 📄 anomalies, YoY, price-creep, cash-flow forecast, safe-to-spend, committed-vs-flexible |
+| Ranges | — | 📄 time-range selector (This month / 3M / 12M / All) |
 
-1. **Real budgeting: per-category monthly budgets with rollover/carryover + budget-vs-actual trend.** (Actual, Firefly, Sure, YNAB.) Today there's only a light "budget pressure." Add editable budgets, "left to budget," and a budget-vs-actual line over months. *Biggest single gap.*
-2. **Savings-rate metric + trend.** (Paisa/FIRE tools.) `(income − spend) / income` per month, plus a rolling average.
-3. **Bills: due-date + "paid this cycle?" status + expected vs actual amount.** (Firefly bills, Paisa calendar, Wallos.) Add per-bill next expected date, whether it's already hit this cycle, and flag when the charged amount deviates from the norm.
-4. **Transfers via a `type` field, not category strings.** Where a source provides an explicit internal-transfer type (e.g. Copilot's `INTERNAL_TRANSFER`), use it to exclude transfers cleanly — more reliable than keyword rules, and it improves every spend metric.
-5. **Annualized subscription cost + % of income.** (Wallos.) Add total annual subscription spend and subscriptions as a % of income.
+## Now — make the dashboard match its own spec
 
-### Tier 2 — high value, modest effort
+The highest-priority work is closing the gap between what `references/dashboard.md` promises
+and what `build_dashboard.py` currently computes:
 
-6. **Savings goals / piggy banks.** (Firefly, Maybe.) Where a source exposes a goal link, surface goal contributions and progress.
-7. **Tag-based views.** (Firefly, Actual.) Flow source tags through and add a tag filter + spend-by-tag.
-8. **Cash-flow statement + money-flow (Sankey) income → categories.** (Firefly, Actual.)
-9. **Rules engine beyond substring.** (Firefly, Actual.) Extend `merchant_categories.csv` to conditional rules (merchant AND amount/account → category/tag).
-10. **Recurring *income* detection** (paycheck cadence), feeding better projections and a "next paycheck" on Overview.
+1. **Time-range selector** (This month / 3M / 12M / All) with range-aware screens.
+2. **Net-worth trend** — accumulate one `networth-history.json` snapshot per build and chart it.
+3. **Richer spending views** — category treemap, day-level calendar heatmap, and subcategory
+   drill-down/filter (the data already carries `subcategory`).
+4. **Debt & Bills** — utilization, a payoff simulator, and auto-loan projection (APR
+   user-editable, since sources rarely provide it).
+5. **Committed vs flexible** at the transaction level, and **safe-to-spend** on Overview.
+6. **Core analytics** — spending anomalies, year-over-year, subscription price-creep, a simple
+   cash-flow forecast, and cash runway.
+7. **Verification** — a headless render check in `tests/` that loads every screen across each
+   range and theme (catches a broken field mapping immediately).
 
-### Tier 3 — high value but needs new data (investments)
+## Next — Tier-1/2 features (from the OSS apps)
 
-11. **Investment holdings analytics: allocation, cost basis, unrealized gain, dividends.** (Maybe, Paisa.) Needs a holdings feed (Plaid `investments holdings`).
-12. **Investment return %: XIRR / time-weighted return.** (Paisa.) Needs holdings + cash-flow dates.
-13. **Net-worth change attribution: contributions vs market growth.** (Maybe, Paisa.)
-14. **FIRE / retirement projection.** (Paisa.) Rough (savings-rate based) now, sharper with investment returns later.
+1. **Real budgeting**: per-category monthly budgets with rollover/carryover + budget-vs-actual
+   trend. (Actual, Firefly, Sure, YNAB.) *Biggest single feature gap.*
+2. **Savings-rate metric + trend**: `(income − spend) / income` per month + rolling average. (Paisa/FIRE.)
+3. **Bills**: next-expected date, "paid this cycle?" status, and expected-vs-actual amount. (Firefly, Wallos, Paisa.)
+4. **Transfers via a `type` field**, not keyword rules — use an explicit internal-transfer type
+   (e.g. Copilot's `INTERNAL_TRANSFER`) to clean up every spend metric.
+5. **Annualized subscription cost + % of income.** (Wallos.)
+6. **Savings goals / piggy banks.** (Firefly, Maybe.)
+7. **Tag-based views** — filter and spend-by-tag. (Firefly, Actual.)
+8. **Cash-flow statement + money-flow (Sankey)** income → categories. (Firefly, Actual.)
+9. **Conditional rules engine** — merchant AND amount/account → category/tag. (Firefly, Actual.)
+10. **Recurring income detection** (paycheck cadence) for better projections.
 
-### Tier 4 — nice-to-have
+## Later — investments & long horizon (Tier 3/4)
 
-15. **Reconciliation drift check.** (Actual.) Flag when a computed running balance diverges from the statement balance.
-16. **Split transactions** (one charge across multiple categories). (Firefly, Actual.)
+- **Investment holdings analytics**: allocation, cost basis, unrealized gain, dividends —
+  needs a holdings feed (Plaid `investments holdings`). (Maybe, Paisa.)
+- **Investment return %**: XIRR / time-weighted return. (Paisa.)
+- **Net-worth change attribution**: contributions vs. market growth. (Maybe, Paisa.)
+- **FIRE / retirement projection** — rough (savings-rate) first, sharper with returns later. (Paisa.)
+- **Reconciliation drift check** — flag when a computed running balance diverges from the
+  statement balance. (Actual.)
+- **Split transactions** — one charge across multiple categories. (Firefly, Actual.)
 
 ## Explicitly out of scope
 
-- **Double-entry / ledger rewrite** (Firefly, Paisa) — overkill for a single-user, read-only, derived-metrics model.
+- **Double-entry / ledger rewrite** (Firefly, Paisa) — overkill for a single-user,
+  read-only, derived-metrics model.
 - **Multi-currency** (Firefly, Wallos, Paisa) — USD-only unless there's demand.
 - **Manual transaction entry / write-back** — the pipeline is read-only by design.
 
-## Suggested next steps
+## What each app is best at (credit & context)
 
-Quickest wins that materially improve the dashboard: **(4) transfer-via-type**,
-**(2) savings-rate**, **(5) annualized subs**, then **(1) real budgeting** and
-**(3) bill due/paid status** as the flagship features. Investments (Tier 3) is
-the largest untapped area but gated on a holdings data source.
+| App | Core strength (functionality) |
+|---|---|
+| **Wallos** | Subscription/bill tracker: billing cycle, next-due date, cost normalized to monthly/yearly, reminders. |
+| **Sure** (fork of Maybe) | General PFM: net worth, transactions, budgeting, investments, transfers. |
+| **Firefly III** | Double-entry PFM: budgets, bills with due-date/paid status, tags, rules engine, piggy banks, rich reports. |
+| **Actual** | Envelope / zero-based budgeting: rollover budgets, scheduled txns, rules, reconciliation. |
+| **Maybe** | Wealth/net-worth: investment holdings, allocation, return/performance, forecasting. |
+| **Paisa** | Ledger-based investing: XIRR/returns, allocation, retirement/FIRE, bill calendar, loan schedules. |
+| **Mintable** | ETL: Plaid → Sheets/CSV + categorization. |
